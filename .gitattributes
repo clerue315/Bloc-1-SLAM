@@ -1,3 +1,4 @@
+
 # Auto detect text files and perform LF normalization
 
 Savoir ajouter un lien a sa page web.
@@ -6,3 +7,6 @@ La fonction href sert à placer dans le code html la présence d’un lien sur l
 Il faut copier le lien et le placer entre la fonction href.
 
 <a> href="https://www.francetravail.fr/accueil">Mon texte de lien</a>
+
+Erreur a éviter:
+-oublier le slash avant a la fin dans </a>
