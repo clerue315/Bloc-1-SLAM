@@ -1,0 +1,240 @@
+/* Feuille de style - Bloc 1 SLAM */
+
+/* couleurs utilisees sur tout le site */
+:root {
+    --bleu: #1e3a5f;
+    --bleu-clair: #2f6fb3;
+    --orange: #f28c28;
+    --fond: #f4f6f9;
+    --texte: #2b2b2b;
+    --blanc: #ffffff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: var(--fond);
+    color: var(--texte);
+    line-height: 1.6;
+}
+
+/* ---------- En-tete ---------- */
+
+header {
+    background: linear-gradient(135deg, var(--bleu), var(--bleu-clair));
+    color: var(--blanc);
+    text-align: center;
+    padding: 50px 20px;
+}
+
+header h1 {
+    font-size: 2.2em;
+    margin-bottom: 10px;
+}
+
+.sous-titre {
+    font-size: 1.1em;
+    opacity: 0.85;
+}
+
+/* ---------- Menu ---------- */
+
+nav {
+    background-color: var(--bleu);
+    position: sticky;
+    top: 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+nav a {
+    display: block;
+    color: var(--blanc);
+    text-decoration: none;
+    padding: 15px 20px;
+    transition: background-color 0.3s;
+}
+
+nav a:hover {
+    background-color: var(--orange);
+}
+
+/* ---------- Contenu ---------- */
+
+main {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+section {
+    background-color: var(--blanc);
+    padding: 25px 30px;
+    margin-bottom: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    scroll-margin-top: 70px; /* pour que le menu ne cache pas le titre */
+}
+
+section h2 {
+    color: var(--bleu);
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 3px solid var(--orange);
+    display: inline-block;
+}
+
+section p {
+    margin-bottom: 12px;
+}
+
+/* liens dans le texte */
+main a {
+    color: var(--bleu-clair);
+    font-weight: bold;
+}
+
+main a:hover {
+    color: var(--orange);
+}
+
+/* code */
+code {
+    font-family: "Courier New", monospace;
+    background-color: #eef1f5;
+    color: #c7254e;
+    padding: 2px 5px;
+    border-radius: 4px;
+}
+
+pre {
+    background-color: #282c34;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    overflow-x: auto;
+}
+
+pre code {
+    background: none;
+    color: #98c379;
+    padding: 0;
+}
+
+.resultat {
+    border: 2px dashed var(--bleu-clair);
+    padding: 12px;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.remarque {
+    font-style: italic;
+    color: #666;
+}
+
+/* ---------- Cartes des liens ---------- */
+
+.cartes {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.carte {
+    flex: 1;
+    min-width: 200px;
+    border: 1px solid #dde3ea;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.carte:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+}
+
+.carte h3 {
+    color: var(--bleu);
+    margin-bottom: 8px;
+}
+
+.bouton {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 8px 18px;
+    background-color: var(--bleu-clair);
+    color: var(--blanc);
+    text-decoration: none;
+    border-radius: 20px;
+}
+
+main a.bouton:hover {
+    background-color: var(--orange);
+    color: var(--blanc);
+}
+
+/* ---------- Erreurs ---------- */
+
+.liste-erreurs {
+    list-style: none;
+}
+
+.liste-erreurs li {
+    background-color: #fff4e6;
+    border-left: 4px solid var(--orange);
+    padding: 10px 15px;
+    margin-bottom: 10px;
+}
+
+/* ---------- Pied de page ---------- */
+
+footer {
+    background-color: var(--bleu);
+    color: var(--blanc);
+    text-align: center;
+    padding: 20px;
+    margin-top: 40px;
+}
+
+footer a {
+    color: var(--orange);
+}
+
+/* ---------- Telephone ---------- */
+
+@media (max-width: 600px) {
+    header h1 {
+        font-size: 1.6em;
+    }
+
+    nav a {
+        padding: 10px 12px;
+        font-size: 0.9em;
+    }
+
+    section {
+        padding: 20px;
+    }
+
+    .cartes {
+        flex-direction: column;
+    }
+}

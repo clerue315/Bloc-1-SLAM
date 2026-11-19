@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bloc 1 SLAM - Les liens en HTML</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>Savoir ajouter un lien à sa page web</h1>
+        <p class="sous-titre">Bloc 1 - SLAM</p>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#explication">Explication</a></li>
+            <li><a href="#exemple">Exemple</a></li>
+            <li><a href="#liens">Mes liens</a></li>
+            <li><a href="#erreurs">Erreurs à éviter</a></li>
+        </ul>
+    </nav>
+
+    <main>
+
+        <section id="explication">
+            <h2>A quoi sert href ?</h2>
+            <p>
+                L'attribut <code>href</code> sert à placer dans le code HTML un lien vers une autre page.
+                On le met à l'intérieur de la balise <code>&lt;a&gt;</code>.
+            </p>
+            <p>
+                Il faut copier l'adresse du site et la coller entre les guillemets de <code>href</code>,
+                puis écrire le texte qui sera cliquable entre <code>&lt;a&gt;</code> et <code>&lt;/a&gt;</code>.
+            </p>
+        </section>
+
+        <section id="exemple">
+            <h2>Exemple</h2>
+            <pre><code>&lt;a href="https://www.francetravail.fr/accueil"&gt;Mon texte de lien&lt;/a&gt;</code></pre>
+            <p>Ce qui donne :</p>
+            <p class="resultat">
+                <a href="https://www.francetravail.fr/accueil" target="_blank">Mon texte de lien</a>
+            </p>
+            <p class="remarque">
+                Astuce : avec <code>target="_blank"</code> le lien s'ouvre dans un nouvel onglet.
+            </p>
+        </section>
+
+        <section id="liens">
+            <h2>Quelques liens utiles</h2>
+            <div class="cartes">
+                <div class="carte">
+                    <h3>France Travail</h3>
+                    <p>Le site pour chercher un emploi ou une formation.</p>
+                    <a class="bouton" href="https://www.francetravail.fr/accueil" target="_blank">Voir le site</a>
+                </div>
+                <div class="carte">
+                    <h3>MDN</h3>
+                    <p>La documentation sur la balise &lt;a&gt; et ses attributs.</p>
+                    <a class="bouton" href="https://developer.mozilla.org/fr/docs/Web/HTML/Element/a" target="_blank">Voir le site</a>
+                </div>
+                <div class="carte">
+                    <h3>W3Schools</h3>
+                    <p>Des exercices pour s'entraîner sur le HTML et le CSS.</p>
+                    <a class="bouton" href="https://www.w3schools.com/html/html_links.asp" target="_blank">Voir le site</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="erreurs">
+            <h2>Erreurs à éviter</h2>
+            <ul class="liste-erreurs">
+                <li>Oublier le slash dans la balise de fin : il faut écrire <code>&lt;/a&gt;</code> et pas <code>&lt;a&gt;</code>.</li>
+                <li>Mettre <code>href</code> en dehors de la balise : <code>&lt;a&gt;href="..."</code> ne marche pas.</li>
+                <li>Oublier les guillemets autour de l'adresse.</li>
+                <li>Oublier le <code>https://</code> au début du lien.</li>
+            </ul>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>Projet BTS SIO - Bloc 1 SLAM</p>
+        <p><a href="#">Retour en haut</a></p>
+    </footer>
+
+</body>
+</html>
