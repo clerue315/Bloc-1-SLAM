@@ -1,47 +1,50 @@
 <?php
-/*
- * index.php — Liste des ressources (documents et favoris)
- * avec filtre par mots-clés.
- */
+// Page d'accueil : liste des documents et des favoris + filtre par mots-cles
 require_once "includes/fonctions.php";
 
-// 1. Mots-clés saisis dans le filtre.
-//    Le formulaire utilise GET : l'URL filtrée peut être copiée ou mise en favori.
+// Mots-cles tapes dans le filtre (le formulaire est en GET pour pouvoir copier l'url)
 $saisie = $_GET["mots-cles"] ?? "";
 if (!is_string($saisie)) {
-    $saisie = ""; // protection contre ?mots-cles[]=... (tableau au lieu d'une chaîne)
+    $saisie = ""; // au cas ou on recoit ?mots-cles[]=...
 }
 if (!mb_check_encoding($saisie, "UTF-8")) {
-    $saisie = mb_convert_encoding($saisie, "UTF-8", "UTF-8"); // octets invalides -> "?"
+    $saisie = mb_convert_encoding($saisie, "UTF-8", "UTF-8");
 }
 $saisie = trim($saisie);
 
-// 2. Lecture des ressources : lire() reçoit le TABLEAU des mots saisis
-//    (découpage sur les virgules) et ne garde que les ressources correspondantes.
+// On coupe sur les virgules, lire() garde seulement les ressources qui ont tous les mots
 $motsSaisis = explode(",", $saisie);
 $ressources = lire($motsSaisis);
 
-// Le filtre est "actif" s'il reste au moins un vrai mot après nettoyage
-// (une saisie comme " , ,, " équivaut à une saisie vide).
+// Le filtre compte seulement s'il reste un vrai mot (" , ,, " c'est comme rien)
 $filtreActif = !empty(nettoyerMotsCles($motsSaisis));
 
-// 3. Message de confirmation après un ajout, une modification ou une suppression.
-//    Seuls les codes prévus sont acceptés : on n'affiche jamais un texte venant de l'URL.
-$messagesPossibles = [
-    "ajout"        => "La ressource a été ajoutée.",
+// Message apres un ajout, une modif ou une suppression.
+// On affiche uniquement nos phrases, jamais un texte qui vient de l'url.
+$messages = [
+    "ajout" => "La ressource a été ajoutée.",
     "modification" => "La ressource a été modifiée.",
-    "suppression"  => "La ressource a été supprimée.",
+    "suppression" => "La ressource a été supprimée.",
 ];
-$codeMessage = $_GET["message"] ?? "";
-$messageSucces = is_string($codeMessage) ? ($messagesPossibles[$codeMessage] ?? "") : "";
 
-if ($messageSucces !== "" && isset($_GET["guillemets"])) {
+$messageSucces = "";
+$code = $_GET["message"] ?? "";
+if (is_string($code) && isset($messages[$code])) {
+    $messageSucces = $messages[$code];
+}
+
+if ($messageSucces != "" && isset($_GET["guillemets"])) {
     $messageSucces .= ' Les guillemets droits (") saisis ont été convertis automatiquement, '
         . "car ce caractère sert de délimiteur dans le fichier de données.";
 }
 
-// 4. Petit bilan affiché au-dessus de la liste
-$nbDocuments = count(array_filter($ressources, fn($r) => ($r["type"] ?? "") === "document"));
+// Compteurs pour la phrase au-dessus de la liste
+$nbDocuments = 0;
+foreach ($ressources as $r) {
+    if (($r["type"] ?? "") === "document") {
+        $nbDocuments++;
+    }
+}
 $nbFavoris = count($ressources) - $nbDocuments;
 ?>
 <!doctype html>
@@ -49,7 +52,7 @@ $nbFavoris = count($ressources) - $nbDocuments;
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>MediaBox – Mes ressources</title>
+    <title>MediaBox - Mes ressources</title>
     <link rel="stylesheet" href="style/style.css">
 </head>
 <body>
@@ -59,39 +62,36 @@ $nbFavoris = count($ressources) - $nbDocuments;
                 <span class="logo-icone" aria-hidden="true">🎵</span>
                 <span><strong>MediaBox</strong><small>Le partage musical du club</small></span>
             </a>
-            <a class="bouton bouton-clair" href="ajouter.php">＋ Ajouter une ressource</a>
+            <a class="bouton bouton-clair" href="ajouter.php">+ Ajouter une ressource</a>
         </div>
     </header>
 
     <main>
         <h1 class="visuellement-cache">Mes ressources</h1>
 
-        <?php if ($messageSucces !== ""): ?>
+        <?php if ($messageSucces != ""): ?>
             <div class="message message-succes" role="status">
                 <p><?= echapper($messageSucces) ?></p>
             </div>
         <?php endif; ?>
 
-        <!-- Filtre par mots-clés -->
+        <!-- Filtre -->
         <form class="filtre" method="get" action="index.php" role="search">
             <label for="mots-cles">Filtrer par mots-clés</label>
             <div class="filtre-ligne">
-                <input type="search" id="mots-cles" name="mots-cles"
-                       value="<?= echapper($saisie) ?>"
-                       placeholder="ex. : rock, guitare"
-                       aria-describedby="aide-filtre">
+                <input type="search" id="mots-cles" name="mots-cles" value="<?= echapper($saisie) ?>"
+                       placeholder="ex : rock, guitare" aria-describedby="aide-filtre">
                 <button type="submit" class="bouton">Filtrer</button>
                 <a class="bouton bouton-secondaire" href="index.php">Réinitialiser</a>
             </div>
             <p class="aide" id="aide-filtre">
-                Séparez les mots-clés par des virgules : seules les ressources possédant
-                <strong>tous</strong> ces mots-clés sont affichées. Majuscules et accents sont ignorés.
+                Séparez les mots-clés par des virgules. Seules les ressources qui ont
+                <strong>tous</strong> les mots-clés sont affichées (majuscules et accents ignorés).
             </p>
         </form>
 
         <?php if (empty($ressources)): ?>
 
-            <!-- Aucun résultat -->
             <div class="aucun-resultat">
                 <?php if ($filtreActif): ?>
                     <p>Aucun résultat</p>
@@ -117,28 +117,30 @@ $nbFavoris = count($ressources) - $nbDocuments;
             <ul class="liste-ressources">
                 <?php foreach ($ressources as $ressource): ?>
                     <?php
-                    // Préparation des informations de la ressource courante
-                    $id          = $ressource["id"] ?? "";
+                    $id = $ressource["id"] ?? "";
                     $estDocument = ($ressource["type"] ?? "") === "document";
-                    $date        = $ressource["date"] ?? "";
-                    // Mots-clés à afficher : sans espaces superflus, sans vide ni doublon
-                    $motsCles    = array_filter(
-                        explode(", ", formaterMotsCles($ressource["mots-cles"] ?? "")),
-                        fn($mot) => $mot !== ""
-                    );
+                    $date = $ressource["date"] ?? "";
+
+                    // mots-cles a afficher (sans les vides)
+                    $motsCles = [];
+                    foreach (explode(", ", formaterMotsCles($ressource["mots-cles"] ?? "")) as $mot) {
+                        if ($mot !== "") {
+                            $motsCles[] = $mot;
+                        }
+                    }
 
                     if ($estDocument) {
-                        // Document : lien vers le fichier du dossier uploads/ (basename : pas de "../")
-                        $nomFichier    = basename($ressource["fichier"] ?? "");
+                        // basename() pour eviter un nom du style ../../fichier
+                        $nomFichier = basename($ressource["fichier"] ?? "");
                         $cheminFichier = DOSSIER_UPLOADS . $nomFichier;
-                        $lienValide    = $nomFichier !== "" && is_file($cheminFichier);
-                        $lienVoir      = DOSSIER_UPLOADS . rawurlencode($nomFichier);
-                        $extension     = strtolower(pathinfo($nomFichier, PATHINFO_EXTENSION));
+                        $lienValide = $nomFichier !== "" && is_file($cheminFichier);
+                        $lienVoir = DOSSIER_UPLOADS . rawurlencode($nomFichier);
+                        $extension = strtolower(pathinfo($nomFichier, PATHINFO_EXTENSION));
                     } else {
-                        // Favori : on n'affiche le lien que si l'URL est sûre (http/https)
-                        $url        = $ressource["url"] ?? "";
+                        // pour un favori on met le lien seulement si l'url est en http ou https
+                        $url = $ressource["url"] ?? "";
                         $lienValide = urlValide($url);
-                        $lienVoir   = $url;
+                        $lienVoir = $url;
                     }
                     ?>
                     <li>
@@ -157,13 +159,13 @@ $nbFavoris = count($ressources) - $nbDocuments;
 
                             <h2><?= echapper($ressource["titre"] ?? "(sans titre)") ?></h2>
 
-                            <!-- Aperçu directement dans la liste : pochette, lecteur audio ou vidéo -->
+                            <!-- apercu : pochette, morceau mp3 ou video -->
                             <?php if ($estDocument && $lienValide): ?>
                                 <?php if (in_array($extension, ["jpg", "jpeg", "png", "gif"], true)): ?>
-                                    <?php $dimensions = @getimagesize($cheminFichier); // largeur/hauteur : évite les sauts de mise en page ?>
+                                    <?php $taille = @getimagesize($cheminFichier); // largeur et hauteur de l'image ?>
                                     <img class="apercu-image" src="<?= echapper($lienVoir) ?>"
                                          alt="Aperçu de « <?= echapper($ressource["titre"] ?? "") ?> »" loading="lazy"
-                                         <?= $dimensions ? 'width="' . $dimensions[0] . '" height="' . $dimensions[1] . '"' : "" ?>>
+                                         <?= $taille ? 'width="' . $taille[0] . '" height="' . $taille[1] . '"' : "" ?>>
                                 <?php elseif ($extension === "mp3"): ?>
                                     <audio class="apercu-media" controls preload="none" src="<?= echapper($lienVoir) ?>"
                                            aria-label="Écouter « <?= echapper($ressource["titre"] ?? "") ?> »">
@@ -181,11 +183,10 @@ $nbFavoris = count($ressources) - $nbDocuments;
                                 <p class="description"><?= nl2br(echapper($ressource["description"]), false) ?></p>
                             <?php endif; ?>
 
-                            <!-- Cible : fichier (type + taille) ou site web -->
+                            <!-- type et taille du fichier, ou nom du site -->
                             <?php if ($estDocument && $lienValide): ?>
                                 <p class="cible">
-                                    Fichier <?= echapper(strtoupper($extension)) ?>
-                                    · <?= formaterTaille(filesize($cheminFichier)) ?>
+                                    Fichier <?= echapper(strtoupper($extension)) ?> - <?= formaterTaille(filesize($cheminFichier)) ?>
                                 </p>
                             <?php elseif ($estDocument): ?>
                                 <p class="cible alerte">Fichier introuvable sur le serveur</p>
@@ -195,7 +196,7 @@ $nbFavoris = count($ressources) - $nbDocuments;
                                 <p class="cible alerte">Adresse web invalide</p>
                             <?php endif; ?>
 
-                            <!-- Mots-clés : chaque mot est un lien qui filtre la liste -->
+                            <!-- un clic sur un mot-cle filtre la liste -->
                             <?php if (!empty($motsCles)): ?>
                                 <ul class="mots-cles">
                                     <?php foreach ($motsCles as $motCle): ?>
@@ -207,7 +208,6 @@ $nbFavoris = count($ressources) - $nbDocuments;
                                 <p class="sans-mot-cle">Aucun mot-clé</p>
                             <?php endif; ?>
 
-                            <!-- Actions -->
                             <div class="actions">
                                 <?php if ($lienValide && $estDocument): ?>
                                     <a class="action-voir" href="<?= echapper($lienVoir) ?>" target="_blank"
@@ -228,7 +228,7 @@ $nbFavoris = count($ressources) - $nbDocuments;
     </main>
 
     <footer class="pied">
-        <p>MediaBox – prototype de GED pour OrgaPlus · club musical · données stockées dans data/ressources.txt</p>
+        <p>MediaBox - prototype de GED pour OrgaPlus (club musical) - données dans data/ressources.txt</p>
     </footer>
 </body>
 </html>

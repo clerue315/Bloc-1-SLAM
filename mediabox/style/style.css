@@ -1,0 +1,629 @@
+/* ==============================
+   MediaBox - feuille de style
+   ============================== */
+
+
+/* 1. Couleurs */
+
+:root {
+    --principale: #3b3f9e;
+    --principale-fonce: #2b2e7a;
+    --principale-clair: #eceefb;
+    --document: #2563eb;
+    --favori: #e07a16;
+    --fond: #f2f3f8;
+    --texte: #24262e;
+    --gris: #6b6f7d;
+    --bordure: #d9dce6;
+    --erreur: #c0392b;
+    --succes: #23824f;
+    --ombre: 0 2px 10px rgba(30, 35, 70, 0.08);
+}
+
+
+/* 2. Base */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background-color: var(--fond);
+    color: var(--texte);
+    line-height: 1.5;
+    /* pour que le pied de page reste en bas meme si la page est courte */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 30px 20px;
+}
+
+main.etroit {
+    max-width: 720px;
+}
+
+h1 {
+    margin-top: 0;
+    font-size: 1.6em;
+    color: var(--principale);
+}
+
+a {
+    color: var(--document);
+}
+
+/* sans ca le display de .champ passe devant l'attribut hidden */
+[hidden] {
+    display: none !important;
+}
+
+/* texte lu par les lecteurs d'ecran mais pas affiche */
+.visuellement-cache {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+
+/* 3. En-tete */
+
+.entete {
+    background: linear-gradient(90deg, #1f2457, var(--principale));
+    color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.entete-contenu {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: white;
+    text-decoration: none;
+}
+
+.logo-icone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.15);
+    font-size: 1.6em;
+}
+
+.logo strong {
+    display: block;
+    font-size: 1.4em;
+    letter-spacing: 1px;
+}
+
+.logo small {
+    display: block;
+    opacity: 0.8;
+}
+
+
+/* 4. Boutons */
+
+.bouton {
+    display: inline-block;
+    padding: 9px 18px;
+    border: 2px solid var(--principale);
+    border-radius: 6px;
+    background-color: var(--principale);
+    color: white;
+    font: inherit;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.bouton:hover {
+    background-color: var(--principale-fonce);
+    border-color: var(--principale-fonce);
+}
+
+.bouton-secondaire {
+    background-color: white;
+    color: var(--principale);
+}
+
+.bouton-secondaire:hover {
+    background-color: var(--principale-clair);
+    border-color: var(--principale);
+}
+
+/* bouton blanc dans l'en-tete */
+.bouton-clair {
+    background-color: white;
+    border-color: white;
+    color: var(--principale);
+}
+
+.bouton-clair:hover {
+    background-color: var(--principale-clair);
+    border-color: var(--principale-clair);
+}
+
+/* bouton rouge (confirmation de suppression) */
+.bouton-danger {
+    background-color: var(--erreur);
+    border-color: var(--erreur);
+}
+
+.bouton-danger:hover {
+    background-color: #992d22;
+    border-color: #992d22;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+    outline: 3px solid var(--favori);
+    outline-offset: 2px;
+}
+
+
+/* 5. Messages et petits textes */
+
+.message {
+    margin-bottom: 20px;
+    padding: 12px 16px;
+    border-left: 5px solid;
+    border-radius: 6px;
+}
+
+.message p {
+    margin: 0 0 5px;
+}
+
+.message p:last-child {
+    margin-bottom: 0;
+}
+
+.message ul {
+    margin: 5px 0 0;
+    padding-left: 20px;
+}
+
+.message-erreur {
+    background-color: #fdecea;
+    border-color: var(--erreur);
+    color: #842016;
+}
+
+.message-succes {
+    background-color: #e6f5ec;
+    border-color: var(--succes);
+    color: #18573a;
+}
+
+.aide {
+    margin: 5px 0 0;
+    font-size: 0.9em;
+    color: var(--gris);
+}
+
+.alerte {
+    color: var(--erreur);
+    font-weight: bold;
+}
+
+.obligatoire {
+    color: var(--erreur);
+}
+
+
+/* 6. Filtre par mots-cles */
+
+.filtre {
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: var(--ombre);
+}
+
+.filtre label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.filtre-ligne {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.filtre-ligne input {
+    flex: 1;
+    width: auto;
+    min-width: 200px;
+}
+
+.bilan {
+    margin: 0 0 15px;
+    color: var(--gris);
+}
+
+
+/* 7. Liste des ressources */
+
+.liste-ressources {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.ressource {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: 100%;
+    padding: 18px;
+    background-color: white;
+    border-top: 5px solid var(--document);
+    border-radius: 10px;
+    box-shadow: var(--ombre);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.ressource:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 18px rgba(30, 35, 70, 0.14);
+}
+
+.ressource.favori {
+    border-top-color: var(--favori);
+}
+
+.ressource h2 {
+    margin: 0;
+    font-size: 1.15em;
+}
+
+.ressource p {
+    margin: 0;
+}
+
+.ressource-entete {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.ressource-entete time {
+    font-size: 0.85em;
+    color: var(--gris);
+}
+
+.badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: bold;
+}
+
+.badge-document {
+    background-color: #e3ebfd;
+    color: #1d4ed8;
+}
+
+.badge-favori {
+    background-color: #fdeedd;
+    color: #a6500c;
+}
+
+/* pochettes */
+.apercu-image {
+    width: 100%;
+    height: auto;
+    max-height: 220px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+/* lecteur audio ou video */
+.apercu-media {
+    width: 100%;
+    border-radius: 6px;
+}
+
+.description {
+    font-size: 0.95em;
+    color: #43465a;
+}
+
+.cible {
+    font-size: 0.85em;
+    color: var(--gris);
+}
+
+.mots-cles {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.mots-cles a {
+    display: block;
+    padding: 2px 10px;
+    background-color: #eceef5;
+    border-radius: 15px;
+    font-size: 0.85em;
+    color: #43465a;
+    text-decoration: none;
+}
+
+.mots-cles a:hover {
+    background-color: var(--principale);
+    color: white;
+}
+
+.sans-mot-cle {
+    font-size: 0.85em;
+    font-style: italic;
+    color: var(--gris);
+}
+
+/* liens Voir / Modifier / Supprimer en bas de la carte */
+.actions {
+    display: flex;
+    gap: 15px;
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid var(--bordure);
+}
+
+.actions a {
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.actions a:hover {
+    text-decoration: underline;
+}
+
+.action-voir {
+    color: var(--succes);
+}
+
+.action-supprimer {
+    margin-left: auto;
+    color: var(--erreur);
+}
+
+.aucun-resultat {
+    padding: 40px 20px;
+    text-align: center;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: var(--ombre);
+}
+
+.aucun-resultat p:first-child {
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
+
+/* 8. Formulaires (ajout et modification) */
+
+.carte {
+    padding: 30px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: var(--ombre);
+}
+
+/* le petit texte sous le titre et le type dans la page modifier */
+.carte > .aide,
+.type-fixe {
+    margin-bottom: 20px;
+}
+
+.champ {
+    margin-bottom: 20px;
+}
+
+.champ label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="url"],
+input[type="search"],
+textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--bordure);
+    border-radius: 6px;
+    font: inherit;
+    background-color: white;
+}
+
+input[type="text"]:focus,
+input[type="url"]:focus,
+input[type="search"]:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--principale);
+    box-shadow: 0 0 0 3px rgba(59, 63, 158, 0.2);
+}
+
+textarea {
+    resize: vertical;
+}
+
+input[type="file"] {
+    width: 100%;
+    padding: 12px;
+    border: 2px dashed var(--bordure);
+    border-radius: 6px;
+    background-color: #fafbfd;
+    font: inherit;
+    cursor: pointer;
+}
+
+input[type="file"]:hover {
+    border-color: var(--principale);
+}
+
+/* choix Document / Favori presente en deux cartes */
+.choix-type {
+    margin: 0 0 20px;
+    padding: 0;
+    border: none;
+}
+
+.choix-type legend {
+    margin-bottom: 8px;
+    padding: 0;
+    font-weight: bold;
+}
+
+.options-type {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.option-type {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 15px;
+    border: 2px solid var(--bordure);
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.option-type:hover {
+    border-color: #a3a7d9;
+}
+
+.option-type:has(input:checked) {
+    border-color: var(--principale);
+    background-color: var(--principale-clair);
+}
+
+.option-type input {
+    margin-top: 4px;
+    accent-color: var(--principale);
+}
+
+.option-type small {
+    display: block;
+    font-weight: normal;
+    font-size: 0.85em;
+    color: var(--gris);
+}
+
+.boutons-formulaire {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+/* page modifier */
+.type-fixe {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.type-fixe .aide {
+    margin: 0;
+}
+
+.fichier-actuel {
+    margin: 0 0 8px;
+    font-size: 0.9em;
+}
+
+
+/* 9. Pied de page */
+
+.pied {
+    padding: 20px;
+    text-align: center;
+    font-size: 0.85em;
+    color: var(--gris);
+    background-color: white;
+    border-top: 1px solid var(--bordure);
+}
+
+.pied p {
+    margin: 0;
+}
+
+
+/* 10. Telephone */
+
+@media (max-width: 600px) {
+    main {
+        padding: 20px 15px;
+    }
+
+    .entete-contenu {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .carte {
+        padding: 20px;
+    }
+
+    .options-type {
+        grid-template-columns: 1fr;
+    }
+
+    .liste-ressources {
+        grid-template-columns: 1fr;
+    }
+
+    .filtre-ligne .bouton {
+        flex: 1;
+        text-align: center;
+    }
+}

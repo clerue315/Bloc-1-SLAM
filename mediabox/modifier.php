@@ -1,29 +1,30 @@
 <?php
-/*
- * modifier.php — Formulaire d'édition d'une ressource existante.
- * Le type (document / favori) ne peut pas être changé.
- */
+// Page de modification d'une ressource.
+// On ne peut pas changer le type (document ou favori).
 require_once "includes/fonctions.php";
 
-// 1. Vérification de l'identifiant reçu dans l'URL (?id=...)
+// on verifie l'id recu dans l'url (?id=...)
 $id = lireIdDepuisUrl();
-$ressource = ($id !== null) ? getDocumentById($id) : null;
+$ressource = null;
+if ($id !== null) {
+    $ressource = getDocumentById($id);
+}
 
 $erreurs = [];
 
 if ($ressource === null) {
-    http_response_code(404); // ressource introuvable : la page affichera un message
+    http_response_code(404); // la page affichera "Ressource introuvable"
 } else {
 
-    // 2. Le type vient TOUJOURS du fichier, jamais du formulaire :
-    //    impossible de transformer un document en favori (ou l'inverse).
+    // le type est toujours lu dans le fichier et jamais dans le formulaire,
+    // comme ca on ne peut pas transformer un document en favori
     $estDocument = ($ressource["type"] ?? "") === "document";
 
-    // Valeurs de départ : celles de la ressource (formulaire prérempli)
-    $titre       = $ressource["titre"] ?? "";
-    $motsCles    = $ressource["mots-cles"] ?? "";
+    // le formulaire est prerempli avec les valeurs actuelles
+    $titre = $ressource["titre"] ?? "";
+    $motsCles = $ressource["mots-cles"] ?? "";
     $description = $ressource["description"] ?? "";
-    $url         = $ressource["url"] ?? "";
+    $url = $ressource["url"] ?? "";
     $fichierActuel = basename($ressource["fichier"] ?? "");
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -33,28 +34,27 @@ if ($ressource === null) {
                 . ini_get("post_max_size") . "). Choisissez un fichier plus léger.";
         } else {
 
-            // 3. Récupération des saisies (réaffichées en cas d'erreur)
-            $titre       = lireChampPost("titre");
-            $motsCles    = lireChampPost("mots-cles");
+            $titre = lireChampPost("titre");
+            $motsCles = lireChampPost("mots-cles");
             $description = lireChampPost("description");
-            $url         = lireChampPost("url");
-            $fichier     = $_FILES["fichier"] ?? null;
+            $url = lireChampPost("url");
+            $fichier = $_FILES["fichier"] ?? null;
 
-            // Un nouveau fichier a-t-il été choisi ? (sinon on garde l'ancien)
+            // si aucun nouveau fichier n'est choisi on garde l'ancien
             $remplacerFichier = $estDocument && isset($fichier["error"]) && $fichier["error"] !== UPLOAD_ERR_NO_FILE;
 
-            // 4. Vérifications côté serveur
             if (nettoyerTexte($titre) === "") {
                 $erreurs[] = "Le titre est obligatoire.";
             } elseif (mb_strlen($titre) > 150) {
                 $erreurs[] = "Le titre ne doit pas dépasser 150 caractères.";
             }
 
-            $fichierAccepte = false; // devient true si le nouveau fichier passe les contrôles
+            $fichierOk = false;
             if ($remplacerFichier) {
                 $erreurFichier = verifierFichier($fichier);
-                $fichierAccepte = ($erreurFichier === null);
-                if (!$fichierAccepte) {
+                if ($erreurFichier === null) {
+                    $fichierOk = true;
+                } else {
                     $erreurs[] = $erreurFichier;
                 }
             }
@@ -64,7 +64,7 @@ if ($ressource === null) {
                     $erreurs[] = "L'adresse (URL) est obligatoire pour un favori.";
                 } elseif (!urlValide($url)) {
                     $erreurs[] = "L'adresse doit commencer par http:// ou https:// et ne contenir "
-                        . "ni espace ni guillemet (ex. : https://www.php.net).";
+                        . "ni espace ni guillemet (ex : https://www.php.net).";
                 }
             }
 
@@ -72,13 +72,12 @@ if ($ressource === null) {
                 $erreurs[] = "Enregistrement impossible : le fichier " . FICHIER_GED . " n'est pas accessible en écriture.";
             }
 
-            // 5. Enregistrement si tout est correct
             if (empty($erreurs)) {
-                $guillemetsConvertis = str_contains($titre . $motsCles . $description, '"');
+                $guillemets = str_contains($titre . $motsCles . $description, '"');
 
                 $modifications = [
-                    "titre"       => nettoyerTexte($titre),
-                    "mots-cles"   => nettoyerTexte(formaterMotsCles($motsCles)),
+                    "titre" => nettoyerTexte($titre),
+                    "mots-cles" => nettoyerTexte(formaterMotsCles($motsCles)),
                     "description" => nettoyerTexte($description, true),
                 ];
 
@@ -88,7 +87,7 @@ if ($ressource === null) {
 
                 $nouveauFichier = null;
                 if ($remplacerFichier) {
-                    $nouveauFichier = enregistrerFichier($fichier); // nouveau nom généré
+                    $nouveauFichier = enregistrerFichier($fichier);
                     if ($nouveauFichier === null) {
                         $erreurs[] = "Le nouveau fichier n'a pas pu être enregistré dans le dossier uploads/.";
                     } else {
@@ -98,19 +97,24 @@ if ($ressource === null) {
 
                 if (empty($erreurs)) {
                     if (modifier($id, $modifications)) {
-                        // L'ancien fichier n'est supprimé qu'une fois la modification enregistrée
+                        // on supprime l'ancien fichier seulement quand la modif est bien enregistree
                         if ($nouveauFichier !== null && $fichierActuel !== "" && is_file(DOSSIER_UPLOADS . $fichierActuel)) {
                             unlink(DOSSIER_UPLOADS . $fichierActuel);
                         }
-                        header("Location: index.php?message=modification" . ($guillemetsConvertis ? "&guillemets=1" : ""));
+
+                        $retour = "index.php?message=modification";
+                        if ($guillemets) {
+                            $retour .= "&guillemets=1";
+                        }
+                        header("Location: " . $retour);
                         exit;
                     }
                     $erreurs[] = "La ressource n'existe plus : elle a peut-être été supprimée entre-temps.";
                 }
             }
 
-            // Le nouveau fichier était correct mais une autre erreur bloque l'enregistrement
-            if (!empty($erreurs) && $fichierAccepte) {
+            // le navigateur ne garde pas le fichier choisi quand la page se recharge
+            if (!empty($erreurs) && $fichierOk) {
                 $erreurs[] = "Par sécurité, le navigateur ne conserve pas le fichier choisi : sélectionnez-le à nouveau.";
             }
         }
@@ -122,7 +126,7 @@ if ($ressource === null) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>MediaBox – Modifier une ressource</title>
+    <title>MediaBox - Modifier une ressource</title>
     <link rel="stylesheet" href="style/style.css">
 </head>
 <body>
@@ -140,7 +144,6 @@ if ($ressource === null) {
         <div class="carte">
             <?php if ($ressource === null): ?>
 
-                <!-- Identifiant absent, invalide ou inconnu -->
                 <h1>Ressource introuvable</h1>
                 <div class="message message-erreur" role="alert">
                     <p>Aucune ressource ne correspond à cet identifiant : elle a peut-être été supprimée,
@@ -159,7 +162,7 @@ if ($ressource === null) {
                     <?php else: ?>
                         <span class="badge badge-favori"><span aria-hidden="true">🔗</span> Favori</span>
                     <?php endif; ?>
-                    <span class="aide">(le type d'une ressource ne peut pas être modifié)</span>
+                    <span class="aide">(le type ne peut pas être modifié)</span>
                 </p>
 
                 <?php if (!empty($erreurs)): ?>
@@ -195,15 +198,15 @@ if ($ressource === null) {
                             <input type="file" id="fichier" name="fichier" aria-describedby="aide-fichier"
                                    accept=".<?= implode(",.", EXTENSIONS_AUTORISEES) ?>">
                             <p class="aide" id="aide-fichier">
-                                Laissez vide pour conserver le fichier actuel.
+                                Laissez vide pour garder le fichier actuel.
                                 Formats acceptés : <?= implode(", ", EXTENSIONS_AUTORISEES) ?>
-                                — taille maximale : <?= echapper(ini_get("upload_max_filesize")) ?>.
+                                (taille maximale : <?= echapper(ini_get("upload_max_filesize")) ?>).
                             </p>
                         </div>
                     <?php else: ?>
                         <div class="champ">
                             <label for="url">Adresse du site (URL) <span class="obligatoire">*</span></label>
-                            <input type="url" id="url" name="url" required placeholder="https://…"
+                            <input type="url" id="url" name="url" required placeholder="https://..."
                                    value="<?= echapper($url) ?>">
                         </div>
                     <?php endif; ?>
@@ -231,7 +234,7 @@ if ($ressource === null) {
     </main>
 
     <footer class="pied">
-        <p>MediaBox – prototype de GED pour OrgaPlus · club musical · données stockées dans data/ressources.txt</p>
+        <p>MediaBox - prototype de GED pour OrgaPlus (club musical) - données dans data/ressources.txt</p>
     </footer>
 </body>
 </html>
